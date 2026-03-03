@@ -3,697 +3,635 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Unfollow Radar — Real</title>
+<title>Unfollow Radar</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
-
-  :root {
-    --bg: #f5f0e8;
-    --ink: #0f0e0c;
-    --red: #d63a2f;
-    --red-light: #fde8e6;
-    --green: #1a6b3a;
-    --green-light: #e4f5eb;
-    --amber: #c47d0e;
-    --amber-light: #fef3dc;
-    --border: #d4cfc4;
-    --muted: #8a8478;
-    --surface: #ffffff;
-    --surface2: #edeae2;
-  }
+  @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800;900&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  :root {
+    --bg: #0d0d0d;
+    --card: #161616;
+    --border: #2a2a2a;
+    --text: #f2f2f2;
+    --muted: #666;
+    --pink: #ff2d55;
+    --pink-dim: rgba(255,45,85,0.12);
+    --teal: #30d158;
+    --teal-dim: rgba(48,209,88,0.1);
+    --yellow: #ffd60a;
+  }
+
   body {
     background: var(--bg);
-    color: var(--ink);
-    font-family: 'Space Mono', monospace;
+    color: var(--text);
+    font-family: 'Figtree', sans-serif;
     min-height: 100vh;
-  }
-
-  /* Subtle grid background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(var(--border) 1px, transparent 1px),
-      linear-gradient(90deg, var(--border) 1px, transparent 1px);
-    background-size: 40px 40px;
-    opacity: 0.35;
-    pointer-events: none;
-  }
-
-  .page {
-    position: relative;
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 0 24px 80px;
-  }
-
-  /* ── HEADER ── */
-  header {
-    padding: 56px 0 40px;
-    border-bottom: 2px solid var(--ink);
-    margin-bottom: 48px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-  }
-
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: clamp(40px, 7vw, 72px);
-    line-height: 0.95;
-    letter-spacing: -2px;
-  }
-
-  .logo em {
-    font-style: normal;
-    color: var(--red);
-    display: block;
-  }
-
-  .header-right {
-    text-align: right;
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    line-height: 1.8;
-  }
-
-  /* ── INSTRUCTIONS ── */
-  .how-it-works {
-    background: var(--amber-light);
-    border: 1.5px solid var(--amber);
-    padding: 28px 32px;
-    margin-bottom: 40px;
-  }
-
-  .how-it-works h2 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--amber);
-    margin-bottom: 16px;
-  }
-
-  .steps {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    padding: 0 16px 60px;
+  }
+
+  .wrap { width: 100%; max-width: 480px; }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 52px 0 36px;
+  }
+
+  .icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 16px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  h1 {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+
+  h1 span { color: var(--pink); }
+
+  .tagline {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  /* Steps card */
+  .steps-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .steps-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 16px;
   }
 
   .step {
     display: flex;
     gap: 14px;
     align-items: flex-start;
-    font-size: 12px;
-    line-height: 1.7;
-    color: var(--ink);
+    margin-bottom: 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #ccc;
   }
 
-  .step-num {
-    background: var(--amber);
-    color: white;
-    width: 22px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 11px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
+  .step:last-child { margin-bottom: 0; }
 
-  .step a {
-    color: var(--amber);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  /* ── UPLOAD ZONE ── */
-  .upload-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-
-  .upload-zone {
-    border: 2px dashed var(--border);
-    background: var(--surface);
-    padding: 32px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .upload-zone:hover {
-    border-color: var(--ink);
-    background: var(--surface2);
-  }
-
-  .upload-zone.loaded {
-    border-style: solid;
-    border-color: var(--green);
-    background: var(--green-light);
-  }
-
-  .upload-zone.error-zone {
-    border-color: var(--red);
-    background: var(--red-light);
-  }
-
-  .upload-zone input[type="file"] {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-  }
-
-  .upload-icon {
-    font-size: 32px;
-    margin-bottom: 10px;
-    display: block;
-  }
-
-  .upload-label {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 1px;
-    display: block;
-    margin-bottom: 6px;
-  }
-
-  .upload-sublabel {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 1px;
-  }
-
-  .upload-status {
-    font-size: 11px;
-    margin-top: 8px;
-    font-weight: 700;
-    letter-spacing: 1px;
-  }
-
-  .upload-zone.loaded .upload-status { color: var(--green); }
-  .upload-zone.error-zone .upload-status { color: var(--red); }
-
-  .analyze-btn {
-    width: 100%;
-    background: var(--ink);
-    color: var(--bg);
-    border: none;
-    padding: 18px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-    display: block;
-    margin-bottom: 48px;
-  }
-
-  .analyze-btn:hover { background: var(--red); }
-  .analyze-btn:active { transform: scale(0.99); }
-  .analyze-btn:disabled { background: var(--muted); cursor: not-allowed; }
-
-  /* ── RESULTS ── */
-  #results { display: none; }
-  #results.show { display: block; }
-
-  .stats-strip {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    border: 2px solid var(--ink);
-    margin-bottom: 48px;
-    background: var(--surface);
-  }
-
-  .stat {
-    padding: 24px 16px;
-    text-align: center;
-    border-right: 1.5px solid var(--ink);
-  }
-
-  .stat:last-child { border-right: none; }
-
-  .stat-n {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 44px;
-    line-height: 1;
-    letter-spacing: -1px;
-  }
-
-  .stat-n.r { color: var(--red); }
-  .stat-n.g { color: var(--green); }
-
-  .stat-l {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-top: 8px;
-  }
-
-  .section {
-    margin-bottom: 48px;
-  }
-
-  .section-head {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    margin-bottom: 2px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid var(--ink);
-  }
-
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 22px;
-    letter-spacing: -0.5px;
-  }
-
-  .section-title.red { color: var(--red); }
-  .section-title.green { color: var(--green); }
-
-  .section-badge {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  .search-filter {
-    width: 100%;
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-top: none;
-    padding: 10px 14px;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    color: var(--ink);
-    outline: none;
-    margin-bottom: 0;
-    letter-spacing: 1px;
-    transition: border-color 0.2s;
-  }
-
-  .search-filter:focus { border-color: var(--ink); }
-
-  .user-table {
-    border: 1.5px solid var(--border);
-    border-top: none;
-    overflow: hidden;
-    max-height: 480px;
-    overflow-y: auto;
-  }
-
-  .user-row {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    gap: 14px;
-    animation: fadeUp 0.25s ease both;
-    transition: background 0.1s;
-  }
-
-  .user-row:last-child { border-bottom: none; }
-  .user-row:hover { background: var(--surface2); }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .row-num {
-    font-size: 10px;
-    color: var(--border);
-    width: 28px;
-    text-align: right;
-    flex-shrink: 0;
-    letter-spacing: 1px;
-  }
-
-  .row-avatar {
-    width: 36px; height: 36px;
+  .step-dot {
+    width: 24px;
+    height: 24px;
+    background: var(--yellow);
+    color: #000;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Syne', sans-serif;
+    font-size: 11px;
     font-weight: 800;
-    font-size: 14px;
     flex-shrink: 0;
-    color: white;
+    margin-top: 1px;
   }
 
-  .avatar-red { background: var(--red); }
-  .avatar-green { background: var(--green); }
+  .step strong { color: var(--text); }
 
-  .row-handle {
-    flex: 1;
-    font-size: 13px;
-    letter-spacing: 0.5px;
-  }
-
-  .row-handle a {
-    color: var(--ink);
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.15s;
-  }
-
-  .row-handle a:hover { border-color: var(--ink); }
-
-  .row-tag {
-    font-size: 10px;
-    padding: 3px 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-
-  .tag-red { background: var(--red-light); color: var(--red); }
-  .tag-green { background: var(--green-light); color: var(--green); }
-
-  .empty {
-    padding: 40px;
+  /* Upload */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 20px;
+    padding: 48px 24px;
     text-align: center;
-    color: var(--muted);
+    cursor: pointer;
+    position: relative;
+    background: var(--card);
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 16px;
+  }
+
+  .drop-zone:hover, .drop-zone.drag { border-color: var(--pink); background: var(--pink-dim); }
+  .drop-zone.success { border-color: var(--teal); background: var(--teal-dim); border-style: solid; }
+  .drop-zone.fail { border-color: var(--pink); background: var(--pink-dim); border-style: solid; }
+
+  .drop-zone input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .drop-icon { font-size: 40px; display: block; margin-bottom: 12px; }
+  .drop-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .drop-sub { font-size: 13px; color: var(--muted); }
+  .drop-status { margin-top: 12px; font-size: 14px; font-weight: 700; }
+  .drop-zone.success .drop-status { color: var(--teal); }
+  .drop-zone.fail .drop-status { color: var(--pink); }
+
+  /* Progress bar */
+  .progress-wrap {
+    display: none;
+    margin-bottom: 16px;
+  }
+
+  .progress-wrap.show { display: block; }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--pink);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .progress-label {
     font-size: 12px;
-    letter-spacing: 2px;
+    color: var(--muted);
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  /* Analyze button */
+  .analyze-btn {
+    width: 100%;
+    background: var(--pink);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 18px;
+    font-family: 'Figtree', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-bottom: 32px;
+  }
+
+  .analyze-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .analyze-btn:not(:disabled):hover { opacity: 0.85; }
+  .analyze-btn:not(:disabled):active { transform: scale(0.98); }
+
+  /* Results */
+  #results { display: none; }
+  #results.show { display: block; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+
+  .stat-n {
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .stat-n.pink { color: var(--pink); }
+  .stat-n.teal { color: var(--teal); }
+
+  .stat-l {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    border: 1.5px solid var(--border);
-    border-top: none;
-    background: var(--surface);
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .result-section { margin-bottom: 32px; }
+
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .result-title {
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  .result-title.pink { color: var(--pink); }
+  .result-title.teal { color: var(--teal); }
+
+  .result-count {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .filter-input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: 'Figtree', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    margin-bottom: 8px;
+    transition: border-color 0.2s;
+  }
+
+  .filter-input:focus { border-color: var(--muted); }
+  .filter-input::placeholder { color: var(--muted); }
+
+  .user-list {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .user-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+    animation: fadeUp 0.2s ease both;
+  }
+
+  .user-item:last-child { border-bottom: none; }
+  .user-item:hover { background: #1e1e1e; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .u-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 800;
+    flex-shrink: 0;
+    color: #000;
+  }
+
+  .av-pink { background: var(--pink); }
+  .av-teal { background: var(--teal); }
+
+  .u-handle {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 600;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .u-handle a { color: var(--text); text-decoration: none; }
+  .u-handle a:hover { color: var(--pink); }
+
+  .u-open {
+    font-size: 18px;
+    flex-shrink: 0;
+    text-decoration: none;
+    opacity: 0.4;
+    transition: opacity 0.15s;
+  }
+
+  .u-open:hover { opacity: 1; }
+
+  .empty-msg {
+    padding: 32px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
   }
 
   .copy-btn {
-    margin-top: 10px;
+    width: 100%;
     background: transparent;
-    border: 1.5px solid var(--border);
-    padding: 8px 18px;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    font-family: 'Figtree', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
     cursor: pointer;
-    color: var(--muted);
+    margin-top: 8px;
     transition: all 0.15s;
-    width: auto;
-    margin-bottom: 0;
   }
 
-  .copy-btn:hover { border-color: var(--ink); color: var(--ink); background: transparent; }
+  .copy-btn:hover { border-color: var(--muted); color: var(--text); }
 
-  .privacy-note {
-    margin-top: 48px;
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 1px;
-    line-height: 1.8;
+  .privacy {
     text-align: center;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-  }
-
-  @media (max-width: 560px) {
-    .upload-grid { grid-template-columns: 1fr; }
-    .stats-strip { grid-template-columns: repeat(2, 1fr); }
-    .stat:nth-child(2) { border-right: none; }
-    header { flex-direction: column; align-items: flex-start; gap: 12px; }
-    .header-right { text-align: left; }
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-top: 16px;
   }
 </style>
 </head>
 <body>
-<div class="page">
+<div class="wrap">
 
   <header>
-    <div class="logo">
-      UN<em>FOLLOW</em>RADAR
-    </div>
-    <div class="header-right">
-      Real Data.<br>No Login.<br>100% Private.
-    </div>
+    <span class="icon">👁️</span>
+    <h1>Unfollow <span>Radar</span></h1>
+    <p class="tagline">Find out who's not following you back</p>
   </header>
 
-  <!-- Instructions -->
-  <div class="how-it-works">
-    <h2>How to get your Instagram data</h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div>Open Instagram → <strong>Settings</strong> → <strong>Your activity</strong> → <strong>Download your information</strong> (or visit <a href="https://www.instagram.com/download/request/" target="_blank">instagram.com/download/request</a>)</div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div>Select <strong>JSON</strong> format, choose <strong>Followers and Following</strong>, then request the download. Instagram emails you a link within minutes to a few hours.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div>Download and unzip the file. Inside the <strong>connections/followers_and_following/</strong> folder, find <code>followers_1.json</code> and <code>following.json</code>.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div>Upload both files below and hit <strong>Analyze</strong>. Everything runs in your browser — nothing is uploaded to any server.</div>
-      </div>
+  <div class="steps-card">
+    <div class="steps-title">📲 How to get your zip file</div>
+    <div class="step">
+      <div class="step-dot">1</div>
+      <div>Open Instagram → <strong>Settings → Your activity → Download your information</strong></div>
+    </div>
+    <div class="step">
+      <div class="step-dot">2</div>
+      <div>Choose <strong>JSON format</strong>, select <strong>Followers and Following</strong>, then tap <strong>Submit request</strong></div>
+    </div>
+    <div class="step">
+      <div class="step-dot">3</div>
+      <div>Instagram emails you a <strong>.zip file</strong> — download it (usually takes a few minutes)</div>
+    </div>
+    <div class="step">
+      <div class="step-dot">4</div>
+      <div>Upload that <strong>zip file</strong> below — that's it! ✅</div>
     </div>
   </div>
 
-  <!-- Upload -->
-  <div class="upload-grid">
-    <div class="upload-zone" id="zone-followers">
-      <input type="file" accept=".json" id="file-followers" onchange="handleFile('followers', this)">
-      <span class="upload-icon">👥</span>
-      <span class="upload-label">followers_1.json</span>
-      <span class="upload-sublabel">Your followers list</span>
-      <div class="upload-status" id="status-followers"></div>
-    </div>
-    <div class="upload-zone" id="zone-following">
-      <input type="file" accept=".json" id="file-following" onchange="handleFile('following', this)">
-      <span class="upload-icon">➡️</span>
-      <span class="upload-label">following.json</span>
-      <span class="upload-sublabel">Who you follow</span>
-      <div class="upload-status" id="status-following"></div>
-    </div>
+  <div class="drop-zone" id="drop-zone">
+    <input type="file" accept=".zip" id="zip-input" onchange="handleZip(this.files[0])">
+    <span class="drop-icon" id="drop-icon">📦</span>
+    <div class="drop-title" id="drop-title">Upload your Instagram zip</div>
+    <div class="drop-sub" id="drop-sub">Tap to choose or drag & drop</div>
+    <div class="drop-status" id="drop-status"></div>
   </div>
 
-  <button class="analyze-btn" onclick="analyze()" id="analyze-btn" disabled>
-    Upload Both Files to Analyze
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-label" id="progress-label">Reading zip...</div>
+  </div>
+
+  <button class="analyze-btn" id="analyze-btn" disabled onclick="analyze()">
+    Upload Your Zip to Continue
   </button>
 
-  <!-- Results -->
   <div id="results">
-    <div class="stats-strip">
-      <div class="stat">
+    <div class="stats-row">
+      <div class="stat-card">
         <div class="stat-n" id="s-following">—</div>
         <div class="stat-l">Following</div>
       </div>
-      <div class="stat">
+      <div class="stat-card">
         <div class="stat-n" id="s-followers">—</div>
         <div class="stat-l">Followers</div>
       </div>
-      <div class="stat">
-        <div class="stat-n r" id="s-ghosts">—</div>
+      <div class="stat-card">
+        <div class="stat-n pink" id="s-ghosts">—</div>
         <div class="stat-l">Not Back</div>
       </div>
-      <div class="stat">
-        <div class="stat-n g" id="s-fans">—</div>
-        <div class="stat-l">Your Fans</div>
-      </div>
     </div>
 
-    <!-- Not following back -->
-    <div class="section">
-      <div class="section-head">
-        <div class="section-title red">Not Following You Back</div>
-        <div class="section-badge" id="ghost-badge"></div>
+    <div class="result-section">
+      <div class="result-header">
+        <div class="result-title pink">👻 Not following you back</div>
+        <div class="result-count" id="ghost-count"></div>
       </div>
-      <input class="search-filter" type="text" placeholder="filter by username..." oninput="filterList('ghosts', this.value)" id="ghost-filter">
-      <div class="user-table" id="ghost-table"></div>
-      <button class="copy-btn" onclick="copyList('ghosts')">⎘ Copy usernames</button>
+      <input class="filter-input" type="text" placeholder="🔍 Search..." oninput="filterList('ghosts', this.value)">
+      <div class="user-list" id="ghost-list"></div>
+      <button class="copy-btn" onclick="copyList('ghosts')">⎘ Copy all usernames</button>
     </div>
 
-    <!-- Fans -->
-    <div class="section">
-      <div class="section-head">
-        <div class="section-title green">Your Fans (not following back)</div>
-        <div class="section-badge" id="fan-badge"></div>
+    <div class="result-section">
+      <div class="result-header">
+        <div class="result-title teal">💚 Your fans (you don't follow back)</div>
+        <div class="result-count" id="fan-count"></div>
       </div>
-      <input class="search-filter" type="text" placeholder="filter by username..." oninput="filterList('fans', this.value)" id="fan-filter">
-      <div class="user-table" id="fan-table"></div>
-      <button class="copy-btn" onclick="copyList('fans')">⎘ Copy usernames</button>
+      <input class="filter-input" type="text" placeholder="🔍 Search..." oninput="filterList('fans', this.value)">
+      <div class="user-list" id="fan-list"></div>
+      <button class="copy-btn" onclick="copyList('fans')">⎘ Copy all usernames</button>
     </div>
   </div>
 
-  <div class="privacy-note">
-    🔒 All processing happens entirely in your browser. No data ever leaves your device. No tracking, no servers, no accounts.
-  </div>
+  <div class="privacy">🔒 Everything runs in your browser.<br>Your data never leaves your device.</div>
 
 </div>
 
 <script>
   const state = { followers: null, following: null, ghosts: [], fans: [] };
 
+  function setProgress(pct, label) {
+    document.getElementById('progress-wrap').classList.add('show');
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = label;
+  }
+
   function extractHandles(data) {
     const handles = new Set();
-    // Instagram JSON can have multiple shapes depending on export format/version
     function walk(obj) {
       if (!obj) return;
-      if (Array.isArray(obj)) {
-        obj.forEach(walk);
-      } else if (typeof obj === 'object') {
-        // Shape 1: { string_list_data: [{ value: "username" }] }
-        if (obj.string_list_data && Array.isArray(obj.string_list_data)) {
-          obj.string_list_data.forEach(item => {
-            if (item.value) handles.add(item.value.toLowerCase().trim());
-          });
-        }
-        // Shape 2: { href: "https://www.instagram.com/username" }
-        if (obj.href && typeof obj.href === 'string' && obj.href.includes('instagram.com/')) {
-          const match = obj.href.match(/instagram\.com\/([^/?#]+)/);
-          if (match && match[1]) handles.add(match[1].toLowerCase().trim());
-        }
-        // Recurse into all values
-        Object.values(obj).forEach(v => {
-          if (typeof v === 'object') walk(v);
+      if (Array.isArray(obj)) { obj.forEach(walk); return; }
+      if (typeof obj !== 'object') return;
+      if (obj.string_list_data && Array.isArray(obj.string_list_data)) {
+        obj.string_list_data.forEach(item => {
+          if (item.value) handles.add(item.value.toLowerCase().trim());
         });
       }
+      if (obj.href && typeof obj.href === 'string') {
+        const m = obj.href.match(/instagram\.com\/([^/?#]+)/);
+        if (m && m[1]) handles.add(m[1].toLowerCase().trim());
+      }
+      Object.values(obj).forEach(v => { if (v && typeof v === 'object') walk(v); });
     }
     walk(data);
     return handles;
   }
 
-  function handleFile(type, input) {
-    const file = input.files[0];
+  async function handleZip(file) {
     if (!file) return;
-    const zone = document.getElementById(`zone-${type}`);
-    const status = document.getElementById(`status-${type}`);
-
-    const reader = new FileReader();
-    reader.onload = e => {
-      try {
-        const data = JSON.parse(e.target.result);
-        const handles = extractHandles(data);
-        if (handles.size === 0) throw new Error('No usernames found');
-
-        state[type] = handles;
-        zone.classList.remove('error-zone');
-        zone.classList.add('loaded');
-        status.textContent = `✓ ${handles.size} accounts loaded`;
-        checkReady();
-      } catch (err) {
-        zone.classList.add('error-zone');
-        zone.classList.remove('loaded');
-        status.textContent = `✗ Couldn't read file — make sure it's the right JSON`;
-        state[type] = null;
-        checkReady();
-      }
-    };
-    reader.readAsText(file);
-  }
-
-  function checkReady() {
+    const zone = document.getElementById('drop-zone');
     const btn = document.getElementById('analyze-btn');
-    if (state.followers && state.following) {
+
+    zone.classList.remove('success', 'fail');
+    document.getElementById('drop-status').textContent = '';
+    setProgress(10, 'Reading zip file...');
+
+    try {
+      const zip = await JSZip.loadAsync(file);
+      setProgress(30, 'Looking for follower files...');
+
+      // Find followers and following JSON files anywhere in the zip
+      const allFiles = Object.keys(zip.files);
+
+      // followers: could be followers_1.json, followers.json, etc.
+      const followerFile = allFiles.find(f =>
+        f.match(/followers(_1)?\.json$/i) && !f.includes('following')
+      );
+
+      // following: following.json
+      const followingFile = allFiles.find(f =>
+        f.match(/following\.json$/i)
+      );
+
+      if (!followerFile && !followingFile) {
+        throw new Error('Could not find followers/following files in this zip. Make sure you selected JSON format when downloading.');
+      }
+
+      setProgress(55, 'Reading followers...');
+      let followersData = {}, followingData = {};
+
+      if (followerFile) {
+        const txt = await zip.files[followerFile].async('string');
+        followersData = JSON.parse(txt);
+      }
+
+      setProgress(75, 'Reading following...');
+      if (followingFile) {
+        const txt = await zip.files[followingFile].async('string');
+        followingData = JSON.parse(txt);
+      }
+
+      state.followers = extractHandles(followersData);
+      state.following = extractHandles(followingData);
+
+      if (state.followers.size === 0 && state.following.size === 0) {
+        throw new Error('Files found but no usernames detected. Make sure you chose JSON format (not HTML) when downloading.');
+      }
+
+      setProgress(100, `Found ${state.followers.size} followers & ${state.following.size} following`);
+
+      zone.classList.add('success');
+      document.getElementById('drop-icon').textContent = '✅';
+      document.getElementById('drop-title').textContent = 'Zip loaded!';
+      document.getElementById('drop-sub').textContent = file.name;
+      document.getElementById('drop-status').textContent =
+        `${state.followers.size} followers · ${state.following.size} following`;
+
       btn.textContent = 'Analyze →';
       btn.disabled = false;
-    } else if (!state.followers && !state.following) {
-      btn.textContent = 'Upload Both Files to Analyze';
+
+    } catch (err) {
+      setProgress(100, '');
+      document.getElementById('progress-fill').style.background = '#ff2d55';
+      zone.classList.add('fail');
+      document.getElementById('drop-icon').textContent = '❌';
+      document.getElementById('drop-title').textContent = 'Something went wrong';
+      document.getElementById('drop-status').textContent = err.message;
       btn.disabled = true;
-    } else {
-      btn.textContent = 'Upload the Other File Too';
-      btn.disabled = true;
+      btn.textContent = 'Upload Your Zip to Continue';
     }
   }
+
+  // Drag and drop
+  const zone = document.getElementById('drop-zone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (f) handleZip(f);
+  });
 
   function analyze() {
     if (!state.followers || !state.following) return;
 
-    // Not following back: you follow them, they don't follow you
     state.ghosts = [...state.following].filter(h => !state.followers.has(h)).sort();
-    // Fans: they follow you, you don't follow them
     state.fans = [...state.followers].filter(h => !state.following.has(h)).sort();
 
     document.getElementById('s-following').textContent = state.following.size;
     document.getElementById('s-followers').textContent = state.followers.size;
     document.getElementById('s-ghosts').textContent = state.ghosts.length;
-    document.getElementById('s-fans').textContent = state.fans.length;
 
-    document.getElementById('ghost-badge').textContent = `${state.ghosts.length} accounts`;
-    document.getElementById('fan-badge').textContent = `${state.fans.length} accounts`;
+    document.getElementById('ghost-count').textContent = `${state.ghosts.length} people`;
+    document.getElementById('fan-count').textContent = `${state.fans.length} people`;
 
-    renderTable('ghost-table', state.ghosts, 'red');
-    renderTable('fan-table', state.fans, 'green');
+    renderList('ghost-list', state.ghosts, 'pink');
+    renderList('fan-list', state.fans, 'teal');
 
-    const results = document.getElementById('results');
-    results.classList.add('show');
-    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const r = document.getElementById('results');
+    r.style.display = 'block';
+    r.classList.add('show');
+    setTimeout(() => r.scrollIntoView({ behavior: 'smooth' }), 100);
   }
 
-  function renderTable(containerId, handles, color, filterText = '') {
-    const container = document.getElementById(containerId);
-    const filtered = filterText
-      ? handles.filter(h => h.includes(filterText.toLowerCase()))
-      : handles;
+  function renderList(id, handles, color, filter = '') {
+    const el = document.getElementById(id);
+    const filtered = filter ? handles.filter(h => h.includes(filter.toLowerCase())) : handles;
 
-    if (filtered.length === 0) {
-      container.innerHTML = filterText
-        ? `<div class="empty">No results for "${filterText}"</div>`
-        : `<div class="empty">None — you're all good here ✓</div>`;
+    if (!filtered.length) {
+      el.innerHTML = `<div class="empty-msg">${filter ? 'No results found' : 'None here — you\'re good! ✓'}</div>`;
       return;
     }
 
-    container.innerHTML = filtered.map((handle, i) => `
-      <div class="user-row" style="animation-delay:${Math.min(i * 15, 400)}ms">
-        <div class="row-num">${(i + 1).toString().padStart(2, '0')}</div>
-        <div class="row-avatar avatar-${color}">${handle[0].toUpperCase()}</div>
-        <div class="row-handle">
-          <a href="https://instagram.com/${handle}" target="_blank" rel="noopener">@${handle}</a>
-        </div>
-        <div class="row-tag tag-${color}">${color === 'red' ? 'not back' : 'fan'}</div>
+    el.innerHTML = filtered.slice(0, 300).map((h, i) => `
+      <div class="user-item" style="animation-delay:${Math.min(i*12,500)}ms">
+        <div class="u-avatar av-${color}">${h[0].toUpperCase()}</div>
+        <div class="u-handle"><a href="https://instagram.com/${h}" target="_blank">@${h}</a></div>
+        <a class="u-open" href="https://instagram.com/${h}" target="_blank" title="Open profile">↗</a>
       </div>
-    `).join('');
+    `).join('') + (filtered.length > 300 ? `<div class="empty-msg" style="font-size:12px">+ ${filtered.length - 300} more — use the copy button to get all</div>` : '');
   }
 
-  function filterList(type, value) {
+  function filterList(type, val) {
     const list = type === 'ghosts' ? state.ghosts : state.fans;
-    const color = type === 'ghosts' ? 'red' : 'green';
-    const tableId = type === 'ghosts' ? 'ghost-table' : 'fan-table';
-    renderTable(tableId, list, color, value);
+    const color = type === 'ghosts' ? 'pink' : 'teal';
+    renderList(type === 'ghosts' ? 'ghost-list' : 'fan-list', list, color, val);
   }
 
   function copyList(type) {
     const list = type === 'ghosts' ? state.ghosts : state.fans;
     if (!list.length) return;
-    const text = list.map(h => `@${h}`).join('\n');
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = event.target;
+    navigator.clipboard.writeText(list.map(h => `@${h}`).join('\n')).then(() => {
+      const btns = document.querySelectorAll('.copy-btn');
+      const btn = type === 'ghosts' ? btns[0] : btns[1];
       const orig = btn.textContent;
       btn.textContent = '✓ Copied!';
       setTimeout(() => btn.textContent = orig, 2000);
