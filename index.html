@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Unfollow Checker</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f4f4f4;
+        }
+
+        input {
+            padding: 10px;
+            width: 200px;
+        }
+
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: #e1306c;
+            color: white;
+            border: none;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background: white;
+            margin: 5px auto;
+            width: 200px;
+            padding: 5px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Instagram Unfollow Checker (Demo)</h1>
+
+    <input type="text" id="username" placeholder="Enter username">
+    <button onclick="checkUnfollowers()">Check</button>
+
+    <h2>Not Following Back:</h2>
+    <ul id="results"></ul>
+
+    <script>
+        function checkUnfollowers() {
+            // Demo data (pretend this came from Instagram)
+            let following = ["alex", "maria", "john", "sarah", "david"];
+            let followers = ["maria", "john", "david"];
+
+            let notFollowingBack = following.filter(user => !followers.includes(user));
+
+            let resultsList = document.getElementById("results");
+            resultsList.innerHTML = "";
+
+            notFollowingBack.forEach(user => {
+                let li = document.createElement("li");
+                li.textContent = user;
+                resultsList.appendChild(li);
+            });
+        }
+    </script>
+
+</body>
+</html>
