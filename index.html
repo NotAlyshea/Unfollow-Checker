@@ -507,18 +507,20 @@
       const zip = await JSZip.loadAsync(file);
       setProgress(30, 'Looking for follower files...');
 
-      // Find followers and following JSON files anywhere in the zip
-      const allFiles = Object.keys(zip.files);
+      // Find followers and following JSON files anywhere in the zip (any subfolder depth)
+      const allFiles = Object.keys(zip.files).filter(f => !zip.files[f].dir);
 
-      // followers: could be followers_1.json, followers.json, etc.
-      const followerFile = allFiles.find(f =>
-        f.match(/followers(_1)?\.json$/i) && !f.includes('following')
-      );
+      // followers: followers_1.json or followers.json (not following.json)
+      const followerFile = allFiles.find(f => {
+        const name = f.split('/').pop();
+        return name.match(/^followers(_\d+)?\.json$/i);
+      });
 
       // following: following.json
-      const followingFile = allFiles.find(f =>
-        f.match(/following\.json$/i)
-      );
+      const followingFile = allFiles.find(f => {
+        const name = f.split('/').pop();
+        return name.match(/^following\.json$/i);
+      });
 
       if (!followerFile && !followingFile) {
         throw new Error('Could not find followers/following files in this zip. Make sure you selected JSON format when downloading.');
